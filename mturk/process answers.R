@@ -4,8 +4,17 @@ library(mgsub)
 
 load_data = function(){
   files = list.files('mturk'
-                    ,pattern='.csv'
+                    ,pattern='graph.*\\.csv'
                     ,full.names = TRUE)
+  output = lapply(files,fread) %>% 
+    rbindlist()
+  return(output)
+}
+
+load_alley = function(){
+  files = list.files('mturk'
+                    ,pattern='alley.*\\.csv'
+                    ,full.names=TRUE)
   output = lapply(files,fread) %>% 
     rbindlist()
   return(output)
@@ -13,7 +22,7 @@ load_data = function(){
 
 process_answer = function(i,answers){
   a = answers[[i]]
-  a = mgsub(a,c(" ","\\#","\\."),c("","",","))
+  a = mgsub(a,c(" ","\\#","\\.","none","\\{\\}"),c("","",",","",""))
   a = strsplit(a,",")
   r = Reduce(union,a)
   end = sort(as.numeric(r))
@@ -23,8 +32,8 @@ process_answer = function(i,answers){
   return(data.table(start = start, end = end))
 }
 
-check_graph = function(){
-  graph = fread("graph.csv")
+check_graph = function(file="graph.csv"){
+  graph = fread(file)
   tmp = graph[verify == FALSE,list(start,end)]
   i = min(unlist(tmp))
   cat("Checking on",i,"\n")
@@ -32,8 +41,8 @@ check_graph = function(){
   r[order(start,end),list(start,end)]
 }
 
-fix_graph = function(add=NULL,remove=NULL){
-  graph = fread("graph.csv")
+fix_graph = function(add=NULL,remove=NULL,file="graph.csv"){
+  graph = fread(file)
   tmp = graph[verify == FALSE,list(start,end)]
   i = min(unlist(tmp))
   
@@ -51,7 +60,7 @@ fix_graph = function(add=NULL,remove=NULL){
   
   graph[start == i | end == i,verify := TRUE]
   
-  fwrite(graph,"graph.csv")
+  fwrite(graph,file)
   
   invisible(return(graph))
 }
@@ -69,3 +78,17 @@ fix_graph = function(add=NULL,remove=NULL){
 ## Check graph ------
 # check_graph()
 # fix_graph(remove=c(NULL),add=c(NULL))
+
+## Creare initial alley graph --------
+# mturk_alley = load_alley()
+# answers = split(mturk_alley$Answer.connected
+#                ,mturk_alley$Input.target_node)
+# alley = lapply(1:195,process_answer,answers=answers) %>%
+#   rbindlist()
+# alley = unique(alley[start != 0])
+# alley$verify = FALSE
+# fwrite(alley,"alley.csv")
+
+## Check alley ------
+# check_graph("alley.csv")
+# fix_graph(remove=c(195),add=c(NULL),file="alley.csv")
