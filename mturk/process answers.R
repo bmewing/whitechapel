@@ -1,6 +1,7 @@
 library(data.table)
 library(magrittr)
 library(mgsub)
+library(jsonlite)
 
 load_data = function(){
   files = list.files('mturk'
@@ -15,6 +16,15 @@ load_alley = function(){
   files = list.files('mturk'
                     ,pattern='alley.*\\.csv'
                     ,full.names=TRUE)
+  output = lapply(files,fread) %>% 
+    rbindlist()
+  return(output)
+}
+
+load_names = function(){
+  files = list.files('mturk'
+                     ,pattern='names.*\\.csv'
+                     ,full.names=TRUE)
   output = lapply(files,fread) %>% 
     rbindlist()
   return(output)
@@ -79,7 +89,7 @@ fix_graph = function(add=NULL,remove=NULL,file="graph.csv"){
 # check_graph()
 # fix_graph(remove=c(NULL),add=c(NULL))
 
-## Creare initial alley graph --------
+## Create initial alley graph --------
 # mturk_alley = load_alley()
 # answers = split(mturk_alley$Answer.connected
 #                ,mturk_alley$Input.target_node)
@@ -92,3 +102,24 @@ fix_graph = function(add=NULL,remove=NULL,file="graph.csv"){
 ## Check alley ------
 # check_graph("alley.csv")
 # fix_graph(remove=c(195),add=c(NULL),file="alley.csv")
+
+## Load node names
+mturk_names = load_names()
+image = strsplit(mturk_names$Input.image_url,"/")
+mturk_names$node_id = lapply(image,function(x){
+  stringr::str_extract(rev(x)[1],"[0-9]+")}
+  ) %>% 
+  unlist()
+answers = split(mturk_names$Answer.number,mturk_names$node_id)
+node_name = lapply(answers,function(x){table(x) %>% 
+    which.max() %>% 
+    names() %>% 
+    as.numeric()}) %>% 
+  unlist()
+output = data.table(id = names(node_name), name = node_name)
+locs = fromJSON("python/node_centers.json")
+loc_dt = lapply(locs,function(z){data.table(x = z[1], y = z[2])}) %>% 
+  rbindlist()
+loc_dt$id = names(locs)
+output = merge(loc_dt,output,by = "id")
+fwrite(output,"node_locations.csv")
