@@ -10,11 +10,11 @@ inspect_space = function(paths,space,clue){
 }
 
 found_clue = function(path,space){
-  if(!any(path == space)) return(NULL)
+  if(!any(path %in% space)) return(NULL)
   return(path)
 }
 
 found_nothing = function(path,space){
-  if(any(path == space)) return(NULL)
+  if(any(path %in% space)) return(NULL)
   return(path)
 }
