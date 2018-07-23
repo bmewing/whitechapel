@@ -1,0 +1,12 @@
+name: whitechapel
+title: whitechapel
+username:
+account: markewing
+server: shinyapps.io
+hostUrl: https://api.shinyapps.io/v1
+appId: 363819
+bundleId: 1495562
+url: https://markewing.shinyapps.io/whitechapel/
+when: 1532364765.76056
+asMultiple: FALSE
+asStatic: FALSE
