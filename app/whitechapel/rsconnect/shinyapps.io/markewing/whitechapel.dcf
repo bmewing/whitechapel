@@ -5,8 +5,8 @@ account: markewing
 server: shinyapps.io
 hostUrl: https://api.shinyapps.io/v1
 appId: 363819
-bundleId: 1495562
+bundleId: 1634249
 url: https://markewing.shinyapps.io/whitechapel/
-when: 1532364765.76056
+when: 1539174268.62218
 asMultiple: FALSE
 asStatic: FALSE

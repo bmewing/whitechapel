@@ -45,7 +45,7 @@ shinyServer(function(input, output, session) {
   })
   
   observeEvent(input$carriageMove,{
-    values$paths = take_a_carriage(values$paths,roads)
+    values$paths = take_a_carriage(values$paths)
   })
   
   observeEvent(input$alleyMove,{
@@ -77,6 +77,8 @@ shinyServer(function(input, output, session) {
   })
   
   output$map = renderPlot({
+    pth <<- values$paths
+    hid <<- values$hideouts
     show_board(values$paths,values$hideouts,roads,alley,node_locations)
   })
   
