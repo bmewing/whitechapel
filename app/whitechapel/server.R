@@ -38,9 +38,6 @@ shinyServer(function(input, output, session) {
   })
   
   observeEvent(input$basicMove,{
-    print(purrr::vec_depth(values$paths))
-    z <<- values$blocked
-    pth <<- values$paths
     values$paths = take_a_step(values$paths,roads,values$blocked)
   })
   
@@ -72,13 +69,10 @@ shinyServer(function(input, output, session) {
   })
   
   observeEvent(input$clearBlock,{
-    print('trying to clear!')
     values$blocked <- NULL
   })
   
   output$map = renderPlot({
-    pth <<- values$paths
-    hid <<- values$hideouts
     show_board(values$paths,values$hideouts,roads,alley,node_locations)
   })
   
